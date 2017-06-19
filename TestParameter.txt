@@ -1,0 +1,7 @@
+1 . *can => cannot 
+2 . *should => can 
+3 . *fly => travel 
+4 . *this => that 
+5 . *will => would 
+6 . *amazing => surprising 
+7 . *one => two 
