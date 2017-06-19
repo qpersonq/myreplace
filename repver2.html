@@ -9,7 +9,7 @@
 branch
 <p id="showinf"></p>
 <p>***快速取代功能***</p>
-123
+
 輸入取代參數並且請上傳文件。
 
      <p>舊字:<input type="text" name="oldw"  id="OldWord" size="20">
@@ -17,6 +17,7 @@ branch
 	<p>是否引用單字置換規則:<input type="checkbox" id="isword"><p>
 	 <input type="button" name="addbutton" id="addReplaceButton" value="新增一筆置換條件" onclick="addshowItem()"></p>
 	  置換條件視窗:<p><textarea  id="replaceItem"  cols="68" rows="10" ></textarea><p>
+	  <p>首部有加星號代表適用單字規則
 	  移除第
 	  <input type="text" name="deli"  id="delnumber" >
 	 <input type="button" name="deleteButton" id="deleteButton" value="條置換條件" onclick="delitem()"></p>
@@ -41,7 +42,9 @@ branch
 
 
  <script language="JavaScript">
+ var originalItemArray=[];
  var replaceItemArray=[];
+ var wordItemArray=[];
  var isReplacement=false;
  
  var proptext;
@@ -66,17 +69,57 @@ function readFile() {
      fReader.readAsText(this.files[0]);
     
     }
-    function doreplace(oristr){
-	     for(var i=0;i<replaceItemArray.length;i+=2){
-		 var re = new RegExp(replaceItemArray[i], 'g');
-		  var  oristr =oristr.replace(re,replaceItemArray[i+1]);
+function doreplace(oristr,oriarr_,reparr_,fcarr_){
+	    for(var i=0;i<oriarr_.length;i++){
+		oristr=	simpleReplace(oristr,oriarr_[i],reparr_[i]);
+			
+			
+			if(fcarr_[i]==true){
+				//word rule tale
+					//_word_
+					oristr=	simpleReplace(oristr," "+oriarr_[i]+" "," "+reparr_[i]+" ");
+					//_word.
+					oristr=	simpleReplace(oristr," "+oriarr_[i]+"."," "+reparr_[i]+".");
+					//_word!
+					oristr=	simpleReplace(oristr," "+oriarr_[i]+"!"," "+reparr_[i]+"!");
+					//_word,
+					oristr=	simpleReplace(oristr," "+oriarr_[i]+","," "+reparr_[i]+",");
+					//_word?
+					oristr=	simpleReplace(oristr," "+oriarr_[i]+"?"," "+reparr_[i]+"?");
+					
+					//_Word_ capcase
+					oristr=	simpleReplace(oristr," "+toTitleCase(oriarr_[i])+" "," "+toTitleCase(reparr_[i])+" ");
+					//_Word.
+					oristr=	simpleReplace(oristr," "+toTitleCase(oriarr_[i])+"."," "+toTitleCase(reparr_[i])+".");
+				
+				
+			}
+			
+			
+			
+			
+		}
+			
+		
 		 
-		 }
+		 
+		 
 	return oristr;
 	}
 	
+function simpleReplace(contx_,ori_,rep_){
+	var oreg = new RegExp(ori_, 'g');
+	var  contx_ =contx_.replace(oreg,rep_);
+	return contx_;
+}
+
+function toTitleCase(str)
+{
+    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+}
+
+function addshowItem(){
 	
-	function addshowItem(){
 	if(repa==""&&repb=="") return;
 	//check isword
 	var isword_bool=document.getElementById("isword").checked ;
@@ -88,40 +131,36 @@ function readFile() {
 	var repb="";
 	repa=document.getElementById('OldWord').value;
 	repb=document.getElementById('NewWord').value; 
-	if(isword_bool==true){
-	repa=" "+repa+" ";
-	repb=" "+repb+" ";
-	}
-	
-	
-	
 	document.getElementById('OldWord').value =null;
 	document.getElementById('NewWord').value =null;
 	//process item
-	
-	replaceItemArray.push(repa);
+		//	alert(isword_bool);
+	wordItemArray.push(Boolean(isword_bool));
+	originalItemArray.push(repa);
 	replaceItemArray.push(repb);
 	 //show in board
 	 showItem();
 	}
 function showItem(){
 var showstr="";
-	 
-	   for(var i=0;i<replaceItemArray.length;i+=2){
+	 isReplacement=false;
+	   for(var i=0;i<replaceItemArray.length;i++){
 	     
         if(i=="0")showstr+="1";
-		else showstr+=(i/2)+1;
+		else showstr+=(i+1);
 	   showstr+=" . ";
-	   showstr+=(replaceItemArray[i]);
+	   if(wordItemArray[i]==true)showstr+="*";
+	   
+	   showstr+=(originalItemArray[i]);
 	   showstr+=(" => ");
-	   showstr+=(replaceItemArray[i+1]);
+	   showstr+=(replaceItemArray[i]);
 	   showstr+=(" \n");
 	   }
 	 
 	 document.getElementById('replaceItem').value =showstr;
 }	
 function genPreview(){
-replaceText=doreplace(proptext);
+	replaceText=doreplace(proptext,originalItemArray,replaceItemArray,wordItemArray);
          isReplacement=true;
 		document.getElementById('repPreview').value = replaceText;
 }
@@ -134,40 +173,46 @@ function genDownload(){
 	   
 	   }
 	   
-var tmpstr=document.getElementById('MyFileTxt').value;
+	var tmpstr=document.getElementById('MyFileTxt').value;
 	   var tfn=tmpstr.split("\\");
 	   
 	   //window.alert(tfn[tfn.length-1]);
 	   download("rep_"+tfn[tfn.length-1],replaceText);
-return;
+	return;
 }
 function delitem(){
 
-var  delnum= document.getElementById('delnumber').value;
-document.getElementById('delnumber').value=null;
-delnum=(delnum-1)*2;
-if(delnum<replaceItemArray.length &&delnum>=0 ){
-replaceItemArray.splice(delnum,2);
-showItem();
-
-}
-
+	var  delnum= document.getElementById('delnumber').value;
+	document.getElementById('delnumber').value=null;
+	delnum=(delnum-1);
+	
+	if(delnum >=0 && delnum<originalItemArray.length){
+		originalItemArray.splice(delnum,1);
+		replaceItemArray.splice(delnum,1);
+		wordItemArray.splice(delnum,1);
+		
+	}
+	else{
+		alert("不正確的引數!");
+		return;
+	}
+	showItem();
 }	
 function TEST(){
- download("sam.txt",proptext);
+	download("sam.txt",proptext);
 }
 
 function download(filename, text) {
-  var element = document.createElement('a');
-  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-  element.setAttribute('download', filename);
+	var element = document.createElement('a');
+	element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+	element.setAttribute('download', filename);
 
-  element.style.display = 'none';
-  document.body.appendChild(element);
+	element.style.display = 'none';
+	document.body.appendChild(element);
 
-  element.click();
+	element.click();
 
-  document.body.removeChild(element);
+	document.body.removeChild(element);
 }
 
   </script> 
