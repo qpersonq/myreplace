@@ -70,11 +70,19 @@ function readFile() {
     
     }
 function doreplace(oristr,oriarr_,reparr_,fcarr_){
+
+
 	    for(var i=0;i<oriarr_.length;i++){
 		
 			
 			
 			if(fcarr_[i]==true){
+						//process mousetag
+						var mousetag=" @@ ";
+						oristr=mousetag+oristr+mousetag;
+						oristr = oristr.replace(/\r\n/g,mousetag+"\n"+mousetag);  
+			
+			          
 				//word rule tale
 					//_word_
 					oristr=	simpleReplace(oristr," "+oriarr_[i]+" "," "+reparr_[i]+" ");
@@ -91,12 +99,13 @@ function doreplace(oristr,oriarr_,reparr_,fcarr_){
 					
 
 					//Word_ capcase
-					oristr=	simpleReplace(oristr,toTitleCase(oriarr_[i])+" ",toTitleCase(reparr_[i])+" ");
+					oristr=	simpleReplace(oristr," "+toTitleCase(oriarr_[i])+" "," "+toTitleCase(reparr_[i])+" ");
 					//_Word_ capcase
 					
 					//_Word.
 					oristr=	simpleReplace(oristr," "+toTitleCase(oriarr_[i])+"."," "+toTitleCase(reparr_[i])+".");
-				
+							//rid mousetag
+							oristr=	simpleReplace(oristr,mousetag,"");
 				
 			}
 			else oristr=	simpleReplace(oristr,oriarr_[i],reparr_[i]);
