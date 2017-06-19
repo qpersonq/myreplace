@@ -5,3 +5,9 @@
 5 . *will => would 
 6 . *amazing => surprising 
 7 . *one => two 
+
+
+
+
+1 . *for => to 
+2 . *Standards => std 
