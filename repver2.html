@@ -1,0 +1,175 @@
+﻿<html>
+
+<head>
+<title>JavaScript Replace</title>
+
+</head>
+
+<body>
+<p id="showinf"></p>
+<p>***快速取代功能***</p>
+
+輸入取代參數並且請上傳文件。
+
+     <p>舊字:<input type="text" name="oldw"  id="OldWord" size="20">
+	    新字:<input type="text" name="neww"  id="NewWord" size="20">
+	<p>是否引用單字置換規則:<input type="checkbox" id="isword"><p>
+	 <input type="button" name="addbutton" id="addReplaceButton" value="新增一筆置換條件" onclick="addshowItem()"></p>
+	  置換條件視窗:<p><textarea  id="replaceItem"  cols="68" rows="10" ></textarea><p>
+	  移除第
+	  <input type="text" name="deli"  id="delnumber" >
+	 <input type="button" name="deleteButton" id="deleteButton" value="條置換條件" onclick="delitem()"></p>
+	 
+     <p>文件: <input id="MyFileTxt"  type="file"     /></p>
+	<p> <input type="button" name="generateRepPrew" id="generateRepPrew" value="產生預覽" onclick="genPreview()">
+     <input type="button" name="generateDownload" id="downloadButton" value="產生下載連結" onclick="genDownload()"></p>
+	原始文件:<p><textarea  id="filePreview" cols="68" rows="10"  ></textarea><p>
+	預覽文件:<p><textarea  id="repPreview" cols="68" rows="10"  ></textarea>
+ <!--   <input type="button" name="testbtn" id="TESTBTN" value="TEST" onclick="TEST()">-->
+    
+     
+
+
+
+
+
+
+
+
+</body>
+
+
+ <script language="JavaScript">
+ var replaceItemArray=[];
+ var isReplacement=false;
+ 
+ var proptext;
+ 
+ var replaceText;
+ 
+    window.onload = function () {
+    document.getElementById('MyFileTxt').onchange = readFile;
+	
+};
+
+function readFile() {
+    
+    var fReader = new FileReader();           
+    fReader.onload = function (event) {
+        document.getElementById('filePreview').value = event.target.result;
+		
+			proptext=event.target.result;
+		
+		
+    };
+     fReader.readAsText(this.files[0]);
+    
+    }
+    function doreplace(oristr){
+	     for(var i=0;i<replaceItemArray.length;i+=2){
+		 var re = new RegExp(replaceItemArray[i], 'g');
+		  var  oristr =oristr.replace(re,replaceItemArray[i+1]);
+		 
+		 }
+	return oristr;
+	}
+	
+	
+	function addshowItem(){
+	if(repa==""&&repb=="") return;
+	//check isword
+	var isword_bool=document.getElementById("isword").checked ;
+	document.getElementById("isword").checked=false;
+	
+	
+	//init new old word and clear
+	var repa="";
+	var repb="";
+	repa=document.getElementById('OldWord').value;
+	repb=document.getElementById('NewWord').value; 
+	if(isword_bool==true){
+	repa=" "+repa+" ";
+	repb=" "+repb+" ";
+	}
+	
+	
+	
+	document.getElementById('OldWord').value =null;
+	document.getElementById('NewWord').value =null;
+	//process item
+	
+	replaceItemArray.push(repa);
+	replaceItemArray.push(repb);
+	 //show in board
+	 showItem();
+	}
+function showItem(){
+var showstr="";
+	 
+	   for(var i=0;i<replaceItemArray.length;i+=2){
+	     
+        if(i=="0")showstr+="1";
+		else showstr+=(i/2)+1;
+	   showstr+=" . ";
+	   showstr+=(replaceItemArray[i]);
+	   showstr+=(" => ");
+	   showstr+=(replaceItemArray[i+1]);
+	   showstr+=(" \n");
+	   }
+	 
+	 document.getElementById('replaceItem').value =showstr;
+}	
+function genPreview(){
+replaceText=doreplace(proptext);
+         isReplacement=true;
+		document.getElementById('repPreview').value = replaceText;
+}
+	
+function genDownload(){
+       if( isReplacement== false) 
+	   {
+	   genPreview();
+	   
+	   
+	   }
+	   
+var tmpstr=document.getElementById('MyFileTxt').value;
+	   var tfn=tmpstr.split("\\");
+	   
+	   //window.alert(tfn[tfn.length-1]);
+	   download("rep_"+tfn[tfn.length-1],replaceText);
+return;
+}
+function delitem(){
+
+var  delnum= document.getElementById('delnumber').value;
+document.getElementById('delnumber').value=null;
+delnum=(delnum-1)*2;
+if(delnum<replaceItemArray.length &&delnum>=0 ){
+replaceItemArray.splice(delnum,2);
+showItem();
+
+}
+
+}	
+function TEST(){
+ download("sam.txt",proptext);
+}
+
+function download(filename, text) {
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  element.setAttribute('download', filename);
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
+}
+
+  </script> 
+
+
+</html>
