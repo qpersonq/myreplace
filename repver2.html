@@ -17,7 +17,7 @@ branch
 	<p>是否引用單字置換規則:<input type="checkbox" id="isword"><p>
 	 <input type="button" name="addbutton" id="addReplaceButton" value="新增一筆置換條件" onclick="addshowItem()"></p>
 	  置換條件視窗:<p><textarea  id="replaceItem"  cols="68" rows="10" ></textarea><p>
-	  <p>首部有加星號代表適用單字規則
+	  <p>首部有加星號代表適用單字規則<p>
 	  移除第
 	  <input type="text" name="deli"  id="delnumber" >
 	 <input type="button" name="deleteButton" id="deleteButton" value="條置換條件" onclick="delitem()"></p>
@@ -71,7 +71,7 @@ function readFile() {
     }
 function doreplace(oristr,oriarr_,reparr_,fcarr_){
 	    for(var i=0;i<oriarr_.length;i++){
-		oristr=	simpleReplace(oristr,oriarr_[i],reparr_[i]);
+		
 			
 			
 			if(fcarr_[i]==true){
@@ -79,22 +79,27 @@ function doreplace(oristr,oriarr_,reparr_,fcarr_){
 					//_word_
 					oristr=	simpleReplace(oristr," "+oriarr_[i]+" "," "+reparr_[i]+" ");
 					//_word.
-					oristr=	simpleReplace(oristr," "+oriarr_[i]+"."," "+reparr_[i]+".");
+					oristr=	simpleReplace(oristr," "+oriarr_[i]+". "," "+reparr_[i]+". ");
 					//_word!
-					oristr=	simpleReplace(oristr," "+oriarr_[i]+"!"," "+reparr_[i]+"!");
+					oristr=	simpleReplace(oristr," "+oriarr_[i]+"! "," "+reparr_[i]+"! ");
 					//_word,
-					oristr=	simpleReplace(oristr," "+oriarr_[i]+","," "+reparr_[i]+",");
+					oristr=	simpleReplace(oristr," "+oriarr_[i]+", "," "+reparr_[i]+", ");
 					//_word?
-					oristr=	simpleReplace(oristr," "+oriarr_[i]+"?"," "+reparr_[i]+"?");
+					oristr=	simpleReplace(oristr," "+oriarr_[i]+"? "," "+reparr_[i]+"? ");
+					//_word:
+					oristr=	simpleReplace(oristr," "+oriarr_[i]+": "," "+reparr_[i]+": ");
 					
+
+					//Word_ capcase
+					oristr=	simpleReplace(oristr,toTitleCase(oriarr_[i])+" ",toTitleCase(reparr_[i])+" ");
 					//_Word_ capcase
-					oristr=	simpleReplace(oristr," "+toTitleCase(oriarr_[i])+" "," "+toTitleCase(reparr_[i])+" ");
+					
 					//_Word.
 					oristr=	simpleReplace(oristr," "+toTitleCase(oriarr_[i])+"."," "+toTitleCase(reparr_[i])+".");
 				
 				
 			}
-			
+			else oristr=	simpleReplace(oristr,oriarr_[i],reparr_[i]);
 			
 			
 			
@@ -109,7 +114,7 @@ function doreplace(oristr,oriarr_,reparr_,fcarr_){
 	
 function simpleReplace(contx_,ori_,rep_){
 	var oreg = new RegExp(ori_, 'g');
-	var  contx_ =contx_.replace(oreg,rep_);
+	contx_ =contx_.replace(oreg,rep_);
 	return contx_;
 }
 
@@ -120,7 +125,7 @@ function toTitleCase(str)
 
 function addshowItem(){
 	
-	if(repa==""&&repb=="") return;
+	
 	//check isword
 	var isword_bool=document.getElementById("isword").checked ;
 	document.getElementById("isword").checked=false;
@@ -131,6 +136,7 @@ function addshowItem(){
 	var repb="";
 	repa=document.getElementById('OldWord').value;
 	repb=document.getElementById('NewWord').value; 
+	if(repa==""&&repb=="") return;
 	document.getElementById('OldWord').value =null;
 	document.getElementById('NewWord').value =null;
 	//process item
